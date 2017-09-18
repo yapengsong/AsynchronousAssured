@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>消息监控</title>
+    <script src="//cdn.bootcss.com/angular.js/1.5.6/angular.min.js"></script>
+    <script type="text/javascript">
+        /*<![CDATA[*/
+        var app = angular.module('app', []);
+        app.controller('TestController', function($rootScope, $scope, $http) {
+
+            $scope.data = {};
+            $scope.rows = [];
+
+
+            //删除
+            $scope.del = function(id) {
+                $http({
+                    url : '/msg/delete?id=' + id,
+                    method : 'POST',
+                }).success(function(r) {
+                    //删除成功后移除数据
+                    $scope.remove(r.id);
+                });
+            }
+
+            //重新发送
+            $scope.againSend = function(id) {
+                $http({
+                    url : '/msg/againSend?id=' + id,
+                    method : 'POST',
+                }).success(function(data) {
+
+                });
+            }
+
+            //初始化载入数据
+            $http({
+                url : '/msg/findAll',
+                method : 'POST'
+            }).success(function(rows) {
+                for ( var i in rows) {
+                    var row = rows[i];
+                    $scope.rows.push(row);
+                }
+            });
+        });
+        /*]]>*/
+    </script>
+</head>
+<body ng-app="app" ng-controller="TestController">
+<h1>消息信息</h1>
+
+<h3>清单列表：</h3>
+<table cellspacing="1" style="background-color: #a0c6e5">
+    <tr style="text-align: center; COLOR: #0076C8; BACKGROUND-COLOR: #F4FAFF; font-weight: bold">
+        <td>编号</td>
+        <td>内容</td>
+        <td>重发次数</td>
+        <td>是否死亡</td>
+        <td>操作</td>
+    </tr>
+    <tr ng-repeat="row in rows" bgcolor='#F4FAFF'>
+
+        <td>{{row.id}}</td>
+        <td>{{row.messageBody}}</td>
+        <td>{{row.messageSendTimes}}</td>
+        <td>{{row.areadlydead}}</td>
+        <td><input ng-click="againSend(row.id)" value="重新发送" type="button" /></td>
+    </tr>
+</table>
+
+<br />
+
+</body>
+</html>
